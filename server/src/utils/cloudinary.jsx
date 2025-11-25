@@ -10,7 +10,6 @@ export const uploadToCloudinary = async (
   base64OrPath,
   folder = "mern_ecom"
 ) => {
-  // base64OrPath can be a data URL (base64) or an actual URL/path if you prefer
   const result = await cloudinary.v2.uploader.upload(base64OrPath, {
     folder,
     resource_type: "image",

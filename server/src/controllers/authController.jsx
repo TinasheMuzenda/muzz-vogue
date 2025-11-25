@@ -18,22 +18,17 @@ export const register = async (req, res) => {
       password,
     } = req.body;
 
-    // Basic server-side validation
     if (!name || !username || !email || !address || !mobile || !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Password policy
     if (!PASSWORD_POLICY_REGEX.test(password)) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Password does not meet policy (13+ characters, at least one uppercase letter, one number and one special character).",
-        });
+      return res.status(400).json({
+        message:
+          "Password does not meet policy (13+ characters, at least one uppercase letter, one number and one special character).",
+      });
     }
 
-    // unique username and email
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
       return res
@@ -41,12 +36,10 @@ export const register = async (req, res) => {
         .json({ message: "Username or email already exists" });
     }
 
-    // upload avatar to Cloudinary if provided (accepts data URL or remote URL)
     let avatarUrl = "";
     if (avatar) {
       avatarUrl = await uploadToCloudinary(avatar, "avatars");
     } else {
-      // placeholder
       avatarUrl =
         "https://res.cloudinary.com/demo/image/upload/v1610000000/placeholder.png";
     }

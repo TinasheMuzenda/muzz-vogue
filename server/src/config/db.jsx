@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export const connectDB = async (mongoUrl) => {
   try {
     const conn = await mongoose.connect(mongoUrl, {
-      serverSelectionTimeoutMS: 10000, // Helps when Atlas takes time to elect primary
+      serverSelectionTimeoutMS: 10000,
     });
 
     console.log(`MongoDB connected: ${conn.connection.host}`);

@@ -1,13 +1,6 @@
 import Product from "../models/Product.jsx";
 import { uploadToCloudinary } from "../utils/cloudinary.jsx";
 
-/**
- * Query params to support:
- * - search: text to search in name/description
- * - brand, color, fabric, gender, category
- * - minPrice, maxPrice
- * - page, limit
- */
 export const listProducts = async (req, res) => {
   try {
     const {
@@ -71,7 +64,6 @@ export const getProduct = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    // Admin-only endpoint, expect validated input
     const {
       name,
       description,
@@ -87,10 +79,8 @@ export const createProduct = async (req, res) => {
       images = [],
     } = req.body;
 
-    // Upload images if provided as base64 or remote URLs
     const uploadedImages = [];
     for (const img of images) {
-      // If the img looks like a data URL or not already cloudinary, upload
       if (img.startsWith("data:") || img.startsWith("http")) {
         const url = await uploadToCloudinary(img, "products");
         uploadedImages.push(url);
@@ -126,7 +116,6 @@ export const updateProduct = async (req, res) => {
   try {
     const updates = req.body;
     if (updates.images && Array.isArray(updates.images)) {
-      // optional: handle image uploads
       const uploaded = [];
       for (const img of updates.images) {
         if (img.startsWith("data:") || img.startsWith("http")) {

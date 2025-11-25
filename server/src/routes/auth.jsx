@@ -5,12 +5,9 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-// Register and login routes for users
 router.post("/register", register);
 router.post("/login", login);
 
-// Admin login route (embedded credential)
-// This provides a JWT with isAdmin true if the provided username/password match code-embedded admin credentials.
 router.post("/admin-login", adminCredentialAuth, (req, res) => {
   const { username, password } = req.body;
   const { ADMIN_USERNAME, ADMIN_PASSWORD } = req.adminCredential;
