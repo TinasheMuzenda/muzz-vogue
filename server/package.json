@@ -22,7 +22,9 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.0.0",
+    "multer": "^2.0.2",
     "paynow": "^2.2.2",
+    "socket.io": "^4.8.1",
     "stripe": "^20.0.0"
   },
   "devDependencies": {
