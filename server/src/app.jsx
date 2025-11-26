@@ -12,12 +12,11 @@ import wishlistRoutes from "./routes/wishlistRoutes.jsx";
 import productSearchRoutes from "./routes/productSearchRoutes.jsx";
 import adminRoutes from "./routes/adminRoutes.jsx";
 
-const PORT = process.env.PORT || 7000;
 const MONGO_URL = process.env.MONGO_URL;
 
-// Connect DB
+// Connect to MongoDB
 if (!MONGO_URL) {
-  console.error("❌ ERROR: MONGO_URL is missing in .env");
+  console.error("ERROR: MONGO_URL missing in .env");
   process.exit(1);
 }
 connectDB(MONGO_URL);
@@ -37,14 +36,15 @@ app.use(
   })
 );
 
-// Rate limiter
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-});
-app.use(limiter);
+// Rate Limiting
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+  })
+);
 
-// Routes
+// ROUTES
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
@@ -53,7 +53,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/products/search", productSearchRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Health check
+// HEALTH CHECK
 app.get("/api/health", (req, res) =>
   res.json({
     ok: true,
@@ -61,7 +61,7 @@ app.get("/api/health", (req, res) =>
   })
 );
 
-// Global error handler
+// GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({
