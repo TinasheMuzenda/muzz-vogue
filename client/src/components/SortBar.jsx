@@ -9,8 +9,8 @@ const SortBar = () => {
         value={filters.sort}
         onChange={(e) => updateFilter("sort", e.target.value)}
         className="
-          px-4 py-2 rounded-md bg-[var(--deep)] text-[var(--light)]
-          border border-[var(--accent-dark)]
+          px-4 py-2 rounded-md bg-(--deep) text-(--light)
+          border border-(--accent-dark)
         "
       >
         <option value="newest">Newest</option>

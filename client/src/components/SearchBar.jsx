@@ -11,10 +11,10 @@ const SearchBar = () => {
         placeholder="Search products..."
         className="
           w-full px-4 py-2 rounded-md 
-          bg-[var(--deep)] text-[var(--light)]
-          placeholder-[var(--accent-dark)]
-          border border-[var(--accent-dark)]
-          focus:outline-none focus:ring-2 focus:ring-[var(--accent)]
+          bg-(--deep) text-(--light)
+          placeholder-(--accent-dark)
+          border border-(--accent-dark)
+          focus:outline-none focus:ring-2 focus:ring-(--accent)
         "
       />
     </div>

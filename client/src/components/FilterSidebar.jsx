@@ -5,7 +5,7 @@ const FilterSidebar = () => {
 
   const Section = ({ title, children }) => (
     <div className="mb-6">
-      <h3 className="text-lg mb-2 text-[var(--accent)]">{title}</h3>
+      <h3 className="text-lg mb-2 text-(--accent)">{title}</h3>
       {children}
     </div>
   );
@@ -14,8 +14,8 @@ const FilterSidebar = () => {
     <aside
       className="
         w-full lg:w-64 p-4 rounded-md
-        bg-[var(--deep)] text-[var(--light)]
-        border border-[var(--accent-dark)]
+        bg-(--deep) text-(--light)
+        border border-(--accent-dark)
         h-max
       "
     >
@@ -24,7 +24,7 @@ const FilterSidebar = () => {
           value={filters.brand}
           onChange={(e) => updateFilter("brand", e.target.value)}
           placeholder="e.g. Nike"
-          className="w-full px-3 py-2 rounded bg-[var(--bg)] border border-[var(--accent-dark)]"
+          className="w-full px-3 py-2 rounded bg-(--bg) border border-(--accent-dark)"
         />
       </Section>
 
@@ -32,7 +32,7 @@ const FilterSidebar = () => {
         <select
           value={filters.gender}
           onChange={(e) => updateFilter("gender", e.target.value)}
-          className="w-full px-3 py-2 rounded bg-[var(--bg)] border border-[var(--accent-dark)]"
+          className="w-full px-3 py-2 rounded bg-(--bg) border border-(--accent-dark)"
         >
           <option value="">All</option>
           <option value="male">Men</option>
@@ -45,7 +45,7 @@ const FilterSidebar = () => {
         <input
           onChange={(e) => updateFilter("colors", e.target.value)}
           placeholder="red, blue"
-          className="w-full px-3 py-2 rounded bg-[var(--bg)] border border-[var(--accent-dark)]"
+          className="w-full px-3 py-2 rounded bg-(--bg) border border-(--accent-dark)"
         />
       </Section>
 
@@ -53,7 +53,7 @@ const FilterSidebar = () => {
         <input
           onChange={(e) => updateFilter("sizes", e.target.value)}
           placeholder="S,M,L"
-          className="w-full px-3 py-2 rounded bg-[var(--bg)] border border-[var(--accent-dark)]"
+          className="w-full px-3 py-2 rounded bg-(--bg) border border-(--accent-dark)"
         />
       </Section>
 
@@ -63,13 +63,13 @@ const FilterSidebar = () => {
             type="number"
             placeholder="Min"
             onChange={(e) => updateFilter("minPrice", e.target.value)}
-            className="w-full px-3 py-2 rounded bg-[var(--bg)] border border-[var(--accent-dark)]"
+            className="w-full px-3 py-2 rounded bg-(--bg) border border-(--accent-dark)"
           />
           <input
             type="number"
             placeholder="Max"
             onChange={(e) => updateFilter("maxPrice", e.target.value)}
-            className="w-full px-3 py-2 rounded bg-[var(--bg)] border border-[var(--accent-dark)]"
+            className="w-full px-3 py-2 rounded bg-(--bg) border border-(--accent-dark)"
           />
         </div>
       </Section>

@@ -8,7 +8,7 @@ const ProductCard = ({ product }) => {
   return (
     <div
       className="
-        bg-[var(--deep)] rounded-md border border-[var(--accent-dark)]
+        bg-(--deep) rounded-md border border-(--accent-dark)
         p-3 hover:scale-[1.02] transition
       "
     >
@@ -18,22 +18,22 @@ const ProductCard = ({ product }) => {
         className="w-full h-52 object-cover rounded"
       />
 
-      <h2 className="mt-3 text-lg text-[var(--light)]">{product.title}</h2>
-      <p className="text-[var(--accent)] font-semibold text-xl">
+      <h2 className="mt-3 text-lg text-(--light)">{product.title}</h2>
+      <p className="text-(--accent) font-semibold text-xl">
         ${product.price}
       </p>
 
       <div className="flex gap-2 mt-4">
         <button
           onClick={() => addToCart(product)}
-          className="flex-1 px-3 py-2 rounded bg-[var(--accent)] text-[var(--deep)]"
+          className="flex-1 px-3 py-2 rounded bg-(--accent) text-(--deep)"
         >
           Add to Cart
         </button>
 
         <button
           onClick={() => addItem(product._id)}
-          className="px-3 py-2 rounded border border-[var(--accent)] text-[var(--accent)]"
+          className="px-3 py-2 rounded border border-(--accent) text-(--accent)"
         >
           ❤
         </button>
