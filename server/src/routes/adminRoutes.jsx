@@ -8,24 +8,25 @@ import {
   listMessages,
   markMessageRead,
 } from "../controllers/adminController.jsx";
-import { authMiddleware } from "../middleware/auth.jsx";
+import authMiddleware from "../middleware/auth.jsx";
 import { requireAdmin } from "../middleware/requireAdmin.jsx";
+import upload from "../middleware/multer.jsx";
 
 const router = Router();
-const upload = multer();
+const defaultUpload = multer();
 
 router.post(
   "/products",
   authMiddleware,
   requireAdmin,
-  upload.array("images", 8),
+  defaultUpload.array("images", 8),
   addProductWithFiles
 );
 router.put(
   "/products/:id",
   authMiddleware,
   requireAdmin,
-  upload.array("images", 8),
+  defaultUpload.array("images", 8),
   updateProductByAdmin
 );
 router.delete(
@@ -43,5 +44,9 @@ router.post(
   requireAdmin,
   markMessageRead
 );
+
+router.post("/product/add", upload.array("images"), addProductWithFiles);
+
+router.put("/product/update/:id", upload.array("images"), updateProductByAdmin);
 
 export default router;

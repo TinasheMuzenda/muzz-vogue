@@ -1,6 +1,8 @@
 import Product from "../models/Product.jsx";
-import { uploadToCloudinary } from "../utils/cloudinary.jsx";
+import { uploadBase64 } from "../utils/uploadBase64.jsx";
+import { uploadBuffer } from "../utils/uploadBuffer.jsx";
 
+// List products with existing filters
 export const listProducts = async (req, res) => {
   try {
     const {
@@ -21,7 +23,7 @@ export const listProducts = async (req, res) => {
 
     if (search) {
       const regex = new RegExp(search, "i");
-      filter.$or = [{ name: regex }, { description: regex }];
+      filter.$or = [{ title: regex }, { description: regex }];
     }
     if (brand) filter.brand = brand;
     if (gender) filter.gender = gender;
@@ -52,97 +54,178 @@ export const listProducts = async (req, res) => {
   }
 };
 
+// Get a single product by ID
 export const getProduct = async (req, res) => {
   try {
-    const p = await Product.findById(req.params.id);
-    if (!p) return res.status(404).json({ message: "Product not found" });
-    res.json(p);
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
   } catch (err) {
     res.status(500).json({ message: "Error fetching product" });
   }
 };
 
+// Create a product with images
 export const createProduct = async (req, res) => {
   try {
-    const {
-      name,
-      description,
-      brand,
-      price,
-      colors = [],
-      sizes = [],
-      fabric = "",
-      gender = "unisex",
-      category = "",
-      inStock = true,
-      stockQuantity = 0,
-      images = [],
-    } = req.body;
+    const { title, description, price, brand, sizes, colors, gender, fabric } =
+      req.body;
 
-    const uploadedImages = [];
-    for (const img of images) {
-      if (img.startsWith("data:") || img.startsWith("http")) {
-        const url = await uploadToCloudinary(img, "products");
-        uploadedImages.push(url);
-      } else {
-        uploadedImages.push(img);
+    let images = [];
+
+    if (req.body.base64Images) {
+      const arr = Array.isArray(req.body.base64Images)
+        ? req.body.base64Images
+        : JSON.parse(req.body.base64Images);
+
+      for (const img of arr) {
+        const uploaded = await uploadBase64(img, "products");
+        images.push(uploaded);
       }
     }
 
-    const newProduct = new Product({
-      name,
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploaded = await uploadBuffer(file.buffer, "products");
+        images.push(uploaded);
+      }
+    }
+
+    const product = await Product.create({
+      title,
       description,
-      brand,
       price,
-      images: uploadedImages,
-      colors,
+      brand,
       sizes,
+      colors,
       fabric,
       gender,
-      category,
-      inStock,
-      stockQuantity,
+      images,
     });
 
-    const saved = await newProduct.save();
-    res.status(201).json(saved);
+    res.status(201).json(product);
   } catch (err) {
     console.error("createProduct error", err);
-    res.status(500).json({ message: "Server error creating product" });
+    res.status(500).json({ message: err.message });
   }
 };
 
+// Update a product by ID
 export const updateProduct = async (req, res) => {
   try {
     const updates = req.body;
-    if (updates.images && Array.isArray(updates.images)) {
-      const uploaded = [];
-      for (const img of updates.images) {
-        if (img.startsWith("data:") || img.startsWith("http")) {
-          const url = await uploadToCloudinary(img, "products");
-          uploaded.push(url);
-        } else uploaded.push(img);
+    let newImages = [];
+
+    if (req.body.base64Images) {
+      const arr = Array.isArray(req.body.base64Images)
+        ? req.body.base64Images
+        : JSON.parse(req.body.base64Images);
+
+      for (const img of arr) {
+        const uploaded = await uploadBase64(img, "products");
+        newImages.push(uploaded);
       }
-      updates.images = uploaded;
+    }
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploaded = await uploadBuffer(file.buffer, "products");
+        newImages.push(uploaded);
+      }
+    }
+
+    if (newImages.length > 0) {
+      updates.images = newImages;
     }
 
     const product = await Product.findByIdAndUpdate(req.params.id, updates, {
       new: true,
     });
     if (!product) return res.status(404).json({ message: "Product not found" });
-    res.json(product);
+
+    res.status(200).json(product);
   } catch (err) {
     console.error("updateProduct error", err);
-    res.status(500).json({ message: "Server error updating product" });
+    res.status(500).json({ message: err.message });
   }
 };
 
+// Delete a product by ID
 export const deleteProduct = async (req, res) => {
   try {
-    const p = await Product.findByIdAndDelete(req.params.id);
-    if (!p) return res.status(404).json({ message: "Product not found" });
+    const product = await Product.findByIdAndDelete(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
     res.json({ message: "Deleted" });
   } catch (err) {
+    console.error("deleteProduct error", err);
     res.status(500).json({ message: "Server error deleting product" });
+  }
+};
+
+// --- New integrated search/filter route ---
+export const getProducts = async (req, res) => {
+  try {
+    const {
+      q,
+      brand,
+      fabric,
+      gender,
+      colors,
+      sizes,
+      minPrice,
+      maxPrice,
+      sort,
+      page = 1,
+      limit = 20,
+    } = req.query;
+
+    let filter = {};
+
+    if (q) {
+      filter.title = { $regex: q, $options: "i" };
+    }
+    if (brand) filter.brand = brand;
+    if (fabric) filter.fabric = fabric;
+
+    if (gender) {
+      const gArr = gender.split(",");
+      filter.gender = { $in: gArr };
+    }
+    if (colors) {
+      const cArr = colors.split(",");
+      filter.colors = { $in: cArr };
+    }
+    if (sizes) {
+      const sArr = sizes.split(",");
+      filter.sizes = { $in: sArr };
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    let sortOption = {};
+    if (sort === "price_asc") sortOption.price = 1;
+    if (sort === "price_desc") sortOption.price = -1;
+    if (sort === "newest") sortOption.createdAt = -1;
+
+    const products = await Product.find(filter)
+      .sort(sortOption)
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Product.countDocuments(filter);
+
+    res.status(200).json({
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+      products,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

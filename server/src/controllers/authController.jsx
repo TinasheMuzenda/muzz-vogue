@@ -1,15 +1,14 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import crypto from "crypto";
 import User from "../models/User.jsx";
-import { uploadBuffer } from "../utils/uploadToCloudinaryStream.jsx";
+import { uploadBase64 } from "../utils/uploadBase64.jsx";
 import { isPasswordStrong } from "../utils/passwordPolicy.jsx";
 import { OAuth2Client } from "google-auth-library";
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// register
 export const register = async (req, res) => {
   try {
     const {
@@ -18,69 +17,60 @@ export const register = async (req, res) => {
       email,
       address,
       mobile,
+      password,
       paymentMethods = [],
       avatar,
-      password,
     } = req.body;
+
     if (!name || !username || !email || !address || !mobile || !password)
       return res.status(400).json({ message: "Missing fields" });
+
     if (!isPasswordStrong(password))
       return res.status(400).json({ message: "Password not strong" });
 
-    const existing = await User.findOne({ $or: [{ username }, { email }] });
-    if (existing)
-      return res
-        .status(400)
-        .json({ message: "Username or email already exists" });
+    const exists = await User.findOne({ $or: [{ username }, { email }] });
+    if (exists) return res.status(409).json({ message: "User already exists" });
 
-    let avatarUrl = "";
-    if (avatar && avatar.startsWith("data:")) {
-      avatarUrl = await uploadBuffer(
-        Buffer.from(avatar.split(",")[1], "base64"),
-        "avatars"
-      );
-    } else avatarUrl = avatar || "";
+    let avatarData = null;
+    if (avatar && avatar.startsWith("data:image")) {
+      avatarData = await uploadBase64(avatar, "avatars");
+    }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    const newUser = await User.create({
       name,
       username,
       email,
       address,
       mobile,
       paymentMethods,
-      avatar: avatarUrl,
+      avatar: avatarData || null,
       passwordHash,
     });
 
     const token = jwt.sign(
-      { id: user._id, username: user.username, isAdmin: user.isAdmin },
+      { id: newUser._id, username: newUser.username, isAdmin: newUser.isAdmin },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    res.status(201).json({
+    return res.status(201).json({
+      message: "User created",
       user: {
-        id: user._id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar,
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        avatar: newUser.avatar,
       },
       token,
     });
   } catch (err) {
-    if (err.code === 11000)
-      return res
-        .status(400)
-        .json({ message: "Username or email already exists" });
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: err.message });
   }
 };
 
-// login
 export const login = async (req, res) => {
   try {
     const { usernameOrEmail, password } = req.body;
@@ -101,7 +91,7 @@ export const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({
+    return res.json({
       user: {
         id: user._id,
         name: user.name,
@@ -112,11 +102,24 @@ export const login = async (req, res) => {
       token,
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
-// forgot password
+export const uploadAvatar = async (req, res) => {
+  try {
+    const { image } = req.body;
+    if (!image) return res.status(400).json({ message: "Image missing" });
+
+    const uploaded = await uploadBase64(image, "avatars");
+    return res.status(200).json({ ...uploaded });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: err.message });
+  }
+};
+
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -135,15 +138,13 @@ export const forgotPassword = async (req, res) => {
     await user.save();
 
     const resetLink = `${CLIENT_URL}/reset-password?token=${token}&id=${user._id}`;
-
-    res.json({ message: "Reset link generated", resetLink });
+    return res.json({ message: "Reset link generated", resetLink });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
-// reset password
 export const resetPassword = async (req, res) => {
   try {
     const { id, token, newPassword } = req.body;
@@ -166,34 +167,13 @@ export const resetPassword = async (req, res) => {
     user.resetPasswordExpires = null;
     await user.save();
 
-    res.json({ message: "Password reset successful" });
+    return res.json({ message: "Password reset successful" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
-// avatar upload
-export const uploadAvatar = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const file = req.file;
-    if (!file) return res.status(400).json({ message: "No file" });
-
-    const url = await uploadBuffer(file.buffer, "avatars");
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { avatar: url },
-      { new: true }
-    ).select("-passwordHash");
-    res.json({ user });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-// google sign-in
 export const googleSignIn = async (req, res) => {
   try {
     const { idToken } = req.body;
@@ -233,7 +213,8 @@ export const googleSignIn = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-    res.json({
+
+    return res.json({
       user: {
         id: user._id,
         name: user.name,
@@ -245,6 +226,6 @@ export const googleSignIn = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(400).json({ message: "Google token invalid" });
+    return res.status(400).json({ message: "Google token invalid" });
   }
 };

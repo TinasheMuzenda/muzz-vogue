@@ -1,95 +1,141 @@
 import Product from "../models/Product.jsx";
 import Message from "../models/Message.jsx";
-import { uploadBuffer } from "../utils/uploadToCloudinaryStream.jsx";
+import { uploadBase64 } from "../utils/uploadBase64.jsx";
+import { uploadBuffer } from "../utils/uploadBuffer.jsx";
 import { io } from "../index.jsx";
 
-// add product with image files
 export const addProductWithFiles = async (req, res) => {
-  const {
-    name,
-    description,
-    brand,
-    price,
-    colors = [],
-    sizes = [],
-    fabric = "",
-    gender = "unisex",
-    category = "",
-    stockQuantity = 0,
-  } = req.body;
+  try {
+    let images = [];
 
-  const files = req.files || [];
+    if (req.body.base64Images) {
+      const arr = Array.isArray(req.body.base64Images)
+        ? req.body.base64Images
+        : JSON.parse(req.body.base64Images);
 
-  const images = [];
-  for (const f of files) {
-    const url = await uploadBuffer(f.buffer, "products");
-    images.push(url);
+      for (const img of arr) {
+        const uploaded = await uploadBase64(img, "products");
+        images.push(uploaded);
+      }
+    }
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploaded = await uploadBuffer(file.buffer, "products");
+        images.push(uploaded);
+      }
+    }
+
+    const product = await Product.create({
+      ...req.body,
+      images,
+      inStock: req.body.stockQuantity > 0,
+    });
+
+    io.to("admins").emit("inventory:update", { action: "create", product });
+
+    res.status(201).json(product);
+  } catch (err) {
+    console.error("addProductWithFiles error", err);
+    res.status(500).json({ message: err.message });
   }
-
-  const p = await Product.create({
-    name,
-    description,
-    brand,
-    price: Number(price),
-    images,
-    colors: Array.isArray(colors) ? colors : [colors],
-    sizes: Array.isArray(sizes) ? sizes : [sizes],
-    fabric,
-    gender,
-    category,
-    stockQuantity,
-    inStock: stockQuantity > 0,
-  });
-
-  io.to("admins").emit("inventory:update", { action: "create", product: p });
-
-  res.status(201).json(p);
 };
 
 export const updateProductByAdmin = async (req, res) => {
-  const { id } = req.params;
-  const updates = { ...req.body };
+  try {
+    let images = [];
 
-  if (req.files && req.files.length) {
-    const uploaded = [];
-    for (const f of req.files) {
-      const url = await uploadBuffer(f.buffer, "products");
-      uploaded.push(url);
+    if (req.body.base64Images) {
+      const arr = Array.isArray(req.body.base64Images)
+        ? req.body.base64Images
+        : JSON.parse(req.body.base64Images);
+
+      for (const img of arr) {
+        const uploaded = await uploadBase64(img, "products");
+        images.push(uploaded);
+      }
     }
-    updates.images = uploaded;
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploaded = await uploadBuffer(file.buffer, "products");
+        images.push(uploaded);
+      }
+    }
+
+    const updates = { ...req.body };
+    if (images.length > 0) updates.images = images;
+    if (updates.stockQuantity !== undefined)
+      updates.inStock = Number(updates.stockQuantity) > 0;
+
+    const updated = await Product.findByIdAndUpdate(req.params.id, updates, {
+      new: true,
+    });
+
+    io.to("admins").emit("inventory:update", {
+      action: "update",
+      product: updated,
+    });
+
+    res.status(200).json(updated);
+  } catch (err) {
+    console.error("updateProductByAdmin error", err);
+    res.status(500).json({ message: err.message });
   }
-
-  if (updates.stockQuantity !== undefined)
-    updates.inStock = Number(updates.stockQuantity) > 0;
-
-  const p = await Product.findByIdAndUpdate(id, updates, { new: true });
-  io.to("admins").emit("inventory:update", { action: "update", product: p });
-
-  res.json(p);
 };
 
 export const removeProductByAdmin = async (req, res) => {
-  const { id } = req.params;
-  const p = await Product.findByIdAndDelete(id);
-  io.to("admins").emit("inventory:update", { action: "delete", productId: id });
-  res.json({ message: "deleted" });
+  try {
+    const { id } = req.params;
+    const product = await Product.findByIdAndDelete(id);
+
+    io.to("admins").emit("inventory:update", {
+      action: "delete",
+      productId: id,
+    });
+
+    res.json({ message: "deleted" });
+  } catch (err) {
+    console.error("removeProductByAdmin error", err);
+    res.status(500).json({ message: err.message });
+  }
 };
 
-// messages handling
 export const createMessage = async (req, res) => {
-  const { name, email, subject = "", message } = req.body;
-  const m = await Message.create({ name, email, subject, message });
-  io.to("admins").emit("messages:new", m);
-  res.status(201).json(m);
+  try {
+    const { name, email, subject = "", message } = req.body;
+    const m = await Message.create({ name, email, subject, message });
+
+    io.to("admins").emit("messages:new", m);
+
+    res.status(201).json(m);
+  } catch (err) {
+    console.error("createMessage error", err);
+    res.status(500).json({ message: err.message });
+  }
 };
 
 export const listMessages = async (req, res) => {
-  const msgs = await Message.find().sort({ createdAt: -1 });
-  res.json(msgs);
+  try {
+    const msgs = await Message.find().sort({ createdAt: -1 });
+    res.json(msgs);
+  } catch (err) {
+    console.error("listMessages error", err);
+    res.status(500).json({ message: err.message });
+  }
 };
 
 export const markMessageRead = async (req, res) => {
-  const { id } = req.params;
-  const m = await Message.findByIdAndUpdate(id, { read: true }, { new: true });
-  res.json(m);
+  try {
+    const { id } = req.params;
+    const m = await Message.findByIdAndUpdate(
+      id,
+      { read: true },
+      { new: true }
+    );
+    res.json(m);
+  } catch (err) {
+    console.error("markMessageRead error", err);
+    res.status(500).json({ message: err.message });
+  }
 };

@@ -11,6 +11,8 @@ import paymentRoutes from "./routes/paymentRoutes.jsx";
 import wishlistRoutes from "./routes/wishlistRoutes.jsx";
 import productSearchRoutes from "./routes/productSearchRoutes.jsx";
 import adminRoutes from "./routes/adminRoutes.jsx";
+import cartRoutes from "./routes/cartRoutes.jsx";
+import authMiddleware from "./middleware/auth.jsx";
 
 const MONGO_URL = process.env.MONGO_URL;
 
@@ -52,6 +54,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/products/search", productSearchRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/cart", authMiddleware, cartRoutes);
 
 // HEALTH CHECK
 app.get("/api/health", (req, res) =>
