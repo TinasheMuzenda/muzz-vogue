@@ -1,19 +1,17 @@
 import React, { useState } from "react";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import Catalog from "./pages/Catalog";
 
-export default function App() {
-  const [count, setCount] = useState(0);
+const App = () => {
   return (
-    <>
-      <div style={{ fontFamily: "system-ui, sans-serif", padding: 24 }}>
-        <h1 className="text-3xl font-bold underline">TINASHE</h1>
-        <p className="text-brand font-bold">
-          FULLSTACK MUZZ TINASHE OWNER VOGUE SITE
-        </p>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-    </>
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--light)]">
+      <Routes>
+        <Route path="/catalog" element={<Catalog />} />
+        {/* <Route path="/cart" element={<CartPage />} /> */}
+      </Routes>
+    </div>
   );
-}
+};
+
+export default App;

@@ -1,20 +1,19 @@
 :root {
-  --color-brand: #3c352c;
-  --color-brand-light: #E0BBE4;
-  --color-brand-dark: #4B3F72;
-  --color-accent: #FEC8D8;
-  --color-neutral: #F8F8F8;
+  --bg: #5C352C;
+  --accent: #E9B48A;
+  --accent-dark: #956959;
+  --deep: #2A1713;
+  --light: #ffffff;
+  --light-soft: #f7f4f2;
 }
 
-.bg-brand {
-  background-color: var(--color-brand);
+body {
+  background: var(--bg);
+  color: var(--light);
+  font-family: 'Inter', sans-serif;
 }
-.text-brand {
-  color: var(--color-brand);
-}
-.bg-accent {
-  background-color: var(--color-accent);
-}
-.text-accent {
-  color: var(--color-accent);
-}
+
+/* bg-[var(--bg)]
+text-[var(--accent)]
+border-[var(--accent-dark)]
+ */
