@@ -1,20 +1,31 @@
 import express from "express";
-import { register, login } from "../controllers/authController.jsx";
+import multer from "multer";
+import {
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+  uploadAvatar,
+  googleSignIn,
+} from "../controllers/authController.jsx";
 import { adminCredentialAuth } from "../middleware/adminAuth.jsx";
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
+const upload = multer();
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
+router.post("/upload-avatar/:userId", upload.single("avatar"), uploadAvatar);
+router.post("/google", googleSignIn);
 
 router.post("/admin-login", adminCredentialAuth, (req, res) => {
   const { username, password } = req.body;
   const { ADMIN_USERNAME, ADMIN_PASSWORD } = req.adminCredential;
-
   if (!username || !password)
     return res.status(400).json({ message: "Missing credentials" });
-
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     const adminToken = jwt.sign(
       { id: "admin-embedded", username: ADMIN_USERNAME, isAdmin: true },
@@ -23,7 +34,6 @@ router.post("/admin-login", adminCredentialAuth, (req, res) => {
     );
     return res.json({ token: adminToken, admin: { username: ADMIN_USERNAME } });
   }
-
   return res.status(401).json({ message: "Invalid admin credentials" });
 });
 
