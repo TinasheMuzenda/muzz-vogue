@@ -8,6 +8,8 @@ import authRoutes from "./routes/auth.jsx";
 import productRoutes from "./routes/products.jsx";
 import orderRoutes from "./routes/orderRoutes.jsx";
 import paymentRoutes from "./routes/paymentRoutes.jsx";
+import wishlistRoutes from "./routes/wishlistRoutes.jsx";
+import productSearchRoutes from "./routes/productSearchRoutes.jsx";
 
 const PORT = process.env.PORT || 7000;
 const MONGO_URL = process.env.MONGO_URL;
@@ -45,6 +47,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/products/search", productSearchRoutes);
 
 // Health check
 app.get("/api/health", (req, res) =>
