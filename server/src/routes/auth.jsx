@@ -37,4 +37,20 @@ router.post("/admin-login", adminCredentialAuth, (req, res) => {
   return res.status(401).json({ message: "Invalid admin credentials" });
 });
 
+router.get("/admin-verify", (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ message: "Unauthorized" });
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decoded.isAdmin) return res.status(401).json({ message: "Not admin" });
+
+    return res.json({ admin: { username: decoded.username } });
+  } catch {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+});
+
 export default router;

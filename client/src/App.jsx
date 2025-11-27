@@ -9,6 +9,9 @@ import UserDashboard from "./pages/UserDashboard";
 import ProfileSection from "./pages/dashboard/ProfileSection";
 import OrdersSection from "./pages/dashboard/OrdersSection";
 import WishlistSection from "./pages/dashboard/WishlistSection";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLogin from "./pages/admin/AdminLogin.jsx";
+import AdminRoute from "./routes/AdminRoute.jsx";
 
 const App = () => {
   return (
@@ -24,6 +27,17 @@ const App = () => {
           <Route path="orders" element={<OrdersSection />} />
           <Route path="wishlist" element={<WishlistSection />} />
         </Route>
+
+        <Route path="/admin/login" element={<AdminLogin />} />
+
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </div>
   );
