@@ -1,8 +1,65 @@
 import { useWishlist } from "../../contexts/WishlistContext.jsx";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import { getWishlist } from "../../services/wishlistService.jsx";
+import api from "../../services/api.jsx";
 
 export default function WishlistSection() {
-  const { wishlist, removeItem } = useWishlist();
+  const { setWishlist, removeItem } = useWishlist();
+  const { user } = useAuth();
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user?._id) return;
+
+    const load = async () => {
+      try {
+        const res = await getWishlist(user._id);
+        const rawItems = res.data.items;
+
+        const detailedItems = await Promise.all(
+          rawItems.map(async (i) => {
+            try {
+              const productRes = await api.get(`/products/${i.productId}`);
+              const p = productRes.data;
+
+              return {
+                _id: p._id,
+                title: p.name,
+                price: p.price,
+                images: p.image
+                  ? [{ url: p.image }]
+                  : p.images
+                  ? p.images.map((img) => ({ url: img }))
+                  : [],
+              };
+            } catch {
+              return null;
+            }
+          })
+        );
+
+        const filtered = detailedItems.filter(Boolean);
+
+        setWishlist(filtered);
+      } catch (err) {
+        console.error("Wishlist loading error:", err);
+        setWishlist([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, [user, setWishlist]);
+
+  const { wishlist } = useWishlist();
+
+  if (loading) {
+    return <p className="text-sm opacity-70">Loading wishlist…</p>;
+  }
 
   return (
     <div>
@@ -15,7 +72,7 @@ export default function WishlistSection() {
             className="p-3 bg-(--deep) border border-(--accent-dark) rounded-md"
           >
             <img
-              src={item.images?.[0]?.url}
+              src={item.images?.[0]?.url || "/placeholder.jpg"}
               alt={item.title}
               className="w-full h-40 object-cover rounded"
             />
