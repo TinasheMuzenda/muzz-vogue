@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api.jsx";
 
 export default function AdminLogin({ onSuccess }) {
@@ -6,6 +7,7 @@ export default function AdminLogin({ onSuccess }) {
   const [p, setP] = useState("");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const login = async () => {
     setLoading(true);
@@ -18,10 +20,10 @@ export default function AdminLogin({ onSuccess }) {
       });
 
       localStorage.setItem("adminToken", res.data.token);
-
       setMsg("Login successful!");
 
       if (onSuccess) onSuccess(res.data);
+      navigate("/admin");
     } catch (err) {
       setMsg(err?.response?.data?.message || "Login failed");
     } finally {

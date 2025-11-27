@@ -2,7 +2,7 @@ import "dotenv/config";
 import http from "http";
 import app from "./app.jsx";
 import { Server } from "socket.io";
-import { socketAuth } from "./middleware/socketAuth.jsx"; // <-- added
+import { socketAuth } from "./middleware/socketAuth.jsx";
 
 const PORT = process.env.PORT || 7000;
 

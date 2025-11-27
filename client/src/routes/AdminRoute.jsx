@@ -4,15 +4,11 @@ import { useAdmin } from "../contexts/AdminContext.jsx";
 export default function AdminRoute({ children }) {
   const { admin, loading } = useAdmin();
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="p-8 text-center text-(--accent)">Validating admin…</div>
+      <div className="p-8 text-center text-(--accent)">Validating admin...</div>
     );
-  }
-
-  if (!admin) {
-    return <Navigate to="/admin/login" replace />;
-  }
+  if (!admin) return <Navigate to="/login" replace />;
 
   return children;
 }
