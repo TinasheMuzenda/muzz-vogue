@@ -7,19 +7,22 @@ import { AuthProvider } from "./contexts/AuthContext.jsx";
 import { ProductsProvider } from "./contexts/ProductsContext.jsx";
 import { WishlistProvider } from "./contexts/WishlistContext.jsx";
 import { CartProvider } from "./contexts/CartContext.jsx";
+import { NotificationsProvider } from "./contexts/NotificationsContext.jsx";
 
 const root = createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <ProductsProvider>
-          <WishlistProvider>
-            <CartProvider>
-              <App />
-            </CartProvider>
-          </WishlistProvider>
-        </ProductsProvider>
+        <NotificationsProvider>
+          <ProductsProvider>
+            <WishlistProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </WishlistProvider>
+          </ProductsProvider>
+        </NotificationsProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

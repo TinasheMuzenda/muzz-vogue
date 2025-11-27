@@ -12,10 +12,14 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
 import AdminRoute from "./routes/AdminRoute.jsx";
 import About from "./pages/About.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
+import NotificationToast from "./components/NotificationToast.jsx";
+import Notifications from "./pages/Notifications.jsx";
 
 const App = () => {
   return (
     <div className="min-h-screen bg-(--bg) text-(--light)">
+      <NotificationToast />
       <Routes>
         <Route path="/" element={<Catalog />} />
         <Route path="/about" element={<About />} />;
@@ -36,6 +40,8 @@ const App = () => {
             </AdminRoute>
           }
         />
+        <Route path="/product/:id" element={<ProductDetails />} />;
+        <Route path="/notifications" element={<Notifications />} />
       </Routes>
     </div>
   );
