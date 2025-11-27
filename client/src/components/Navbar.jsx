@@ -21,7 +21,7 @@ export default function Navbar() {
           to="/"
           className="text-2xl text-r(--accent) font-semibold tracking-wide"
         >
-          MUZZVOGUE
+          MUZZ
         </Link>
 
         <div className="hidden md:flex gap-6 items-center">

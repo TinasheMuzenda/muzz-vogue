@@ -17,6 +17,8 @@ import NotificationToast from "./components/NotificationToast.jsx";
 import Notifications from "./pages/Notifications.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
+import Categories from "./pages/Categories.jsx";
+import Footer from "./components/Footer.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -47,7 +49,9 @@ const App = () => {
         />
         <Route path="/product/:id" element={<ProductDetails />} />;
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/categories" element={<Categories />} />;
       </Routes>
+      <Footer />
     </div>
   );
 };

@@ -25,9 +25,8 @@ export default function About() {
       <div className="max-w-2xl bg-(--deep) border border-(--accent-dark) p-6 rounded-md leading-relaxed">
         <p className="mb-4">
           This clothing brand was created with one purpose: to bridge the gap
-          between{" "}
-          <span className="text-(--accent)">quality and price</span>. For
-          too long, premium international clothing has been out of reach for
+          between <span className="text-(--accent)">quality and price</span>.
+          For too long, premium international clothing has been out of reach for
           many people — we are changing that.
         </p>
 
@@ -54,6 +53,9 @@ export default function About() {
       >
         Return to Shop
       </button>
+      <div className="absolute bottom-30 opacity-10 text-sm">
+         Inspired. Designed. Delivered.
+      </div>
     </div>
   );
 }
