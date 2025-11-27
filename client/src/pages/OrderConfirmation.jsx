@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import api from "../services/api.jsx";
+import OrderTimeline from "../components/OrderTimeline.jsx";
 
 const socket = io(import.meta.env.VITE_API_URL.replace("/api", ""), {
   transports: ["websocket"],
@@ -67,6 +68,8 @@ export default function OrderConfirmation() {
           </span>
         </p>
 
+        <OrderTimeline status={status} />
+
         <h2 className="text-xl mt-6 mb-2 text-(--accent)">Items</h2>
         <div className="space-y-3">
           {order.items.map((item) => (
@@ -79,6 +82,7 @@ export default function OrderConfirmation() {
                 alt={item.productId.title}
                 className="w-20 h-20 object-cover rounded"
               />
+
               <div>
                 <p className="font-semibold">{item.productId.title}</p>
                 <p className="text-(--accent)">

@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext.jsx";
 import { Link } from "react-router-dom";
 import api from "../../services/api.jsx";
 import io from "socket.io-client";
+import OrderTimeline from "../../components/OrderTimeline.jsx";
 
 const socket = io(import.meta.env.VITE_API_URL.replace("/api", ""), {
   transports: ["websocket"],
@@ -83,6 +84,8 @@ export default function OrdersSection() {
                 {order.status.toUpperCase()}
               </span>
             </p>
+
+            <OrderTimeline status={order.status} />
 
             <p className="mt-1">Total: ${order.total.toFixed(2)}</p>
           </div>
