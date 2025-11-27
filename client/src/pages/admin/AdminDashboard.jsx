@@ -10,30 +10,40 @@ export default function AdminDashboard() {
 
   if (!authed) return <AdminLogin onSuccess={() => setAuthed(true)} />;
 
-  const TabBtn = ({ keyName, label }) => (
-    <button
-      onClick={() => setTab(keyName)}
-      className={`
-        px-4 py-2 border border-(--accent-dark) rounded 
-        ${
-          tab === keyName
-            ? "bg-(--accent) text-(--deep)"
-            : "bg-(--deep) text-(--light)"
-        }
-      `}
-    >
-      {label}
-    </button>
-  );
+  const tabBase =
+    "px-4 py-2 border border-(--accent-dark) rounded cursor-pointer";
+  const tabActive = "bg-(--accent) text-(--deep)";
+  const tabInactive = "text-(--light) bg-(--deep)";
 
   return (
-    <div className="p-6 text-(--light)">
-      <h1 className="text-3xl mb-6 text-(--accent)">Admin Dashboard</h1>
+    <div className="min-h-screen p-6 text-(--light)">
+      <h1 className="text-4xl text-(--accent) mb-6">Admin Dashboard</h1>
 
       <div className="flex gap-3 mb-6">
-        <TabBtn keyName="products" label="Products" />
-        <TabBtn keyName="orders" label="Orders" />
-        <TabBtn keyName="messages" label="Messages" />
+        <button
+          className={`${tabBase} ${
+            tab === "products" ? tabActive : tabInactive
+          }`}
+          onClick={() => setTab("products")}
+        >
+          Products
+        </button>
+
+        <button
+          className={`${tabBase} ${tab === "orders" ? tabActive : tabInactive}`}
+          onClick={() => setTab("orders")}
+        >
+          Orders
+        </button>
+
+        <button
+          className={`${tabBase} ${
+            tab === "messages" ? tabActive : tabInactive
+          }`}
+          onClick={() => setTab("messages")}
+        >
+          Messages
+        </button>
       </div>
 
       {tab === "products" && <ProductsAdmin />}
