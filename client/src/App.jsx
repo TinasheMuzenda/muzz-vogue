@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import Catalog from "./pages/Catalog";
 import CartPage from "./pages/Cart";
@@ -15,13 +15,18 @@ import About from "./pages/About.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import NotificationToast from "./components/NotificationToast.jsx";
 import Notifications from "./pages/Notifications.jsx";
+import Navbar from "./components/Navbar.jsx";
+import Home from "./pages/Home.jsx";
 
 const App = () => {
+  const location = useLocation();
   return (
     <div className="min-h-screen bg-(--bg) text-(--light)">
+      {location.pathname !== "/about" && <Navbar />}
       <NotificationToast />
       <Routes>
-        <Route path="/" element={<Catalog />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/catalog" element={<Catalog />} />
         <Route path="/about" element={<About />} />;
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<Checkout />} />
