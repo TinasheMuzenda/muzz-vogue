@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { auth } from "../middleware/auth.jsx";
 import {
   getWishlist,
   addToWishlist,
@@ -7,6 +8,7 @@ import {
 
 const router = Router();
 
+router.get("/", auth, getWishlist);
 router.get("/:userId", getWishlist);
 router.post("/:userId/add", addToWishlist);
 router.post("/:userId/remove", removeFromWishlist);
