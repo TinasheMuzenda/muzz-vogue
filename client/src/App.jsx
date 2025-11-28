@@ -19,6 +19,9 @@ import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
 import Categories from "./pages/Categories.jsx";
 import Footer from "./components/Footer.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import AuthModal from "./components/AuthModal.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 const App = () => {
   const location = useLocation();
@@ -28,6 +31,7 @@ const App = () => {
       <NotificationToast />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/auth" element={<AuthModal />} />
         <Route path="/catalog" element={<Catalog />} />
         <Route path="/about" element={<About />} />;
         <Route path="/cart" element={<CartPage />} />
@@ -50,6 +54,8 @@ const App = () => {
         <Route path="/product/:id" element={<ProductDetails />} />;
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/categories" element={<Categories />} />;
+        <Route path="/reset" element={<ResetPassword />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       <Footer />
     </div>
@@ -57,4 +63,3 @@ const App = () => {
 };
 
 export default App;
-<Route path="/admin" element={<AdminDashboard />} />;

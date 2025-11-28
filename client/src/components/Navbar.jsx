@@ -7,7 +7,7 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { cart } = useCart();
-  const { user, logout } = useAuth();
+  const { user, logout, openAuth } = useAuth();
 
   const linkBase =
     "px-3 py-1 rounded hover:bg-[var(--accent)] hover:text-[var(--deep)] transition";
@@ -71,14 +71,12 @@ export default function Navbar() {
               Logout
             </button>
           ) : (
-            <NavLink
-              to="/auth"
-              className={({ isActive }) =>
-                `${linkBase} ${isActive ? linkActive : linkInactive}`
-              }
+            <button
+              onClick={openAuth}
+              className="px-3 py-1 rounded hover:bg-(--accent) hover:text-(--deep)"
             >
               Login
-            </NavLink>
+            </button>
           )}
         </div>
 
@@ -148,3 +146,4 @@ export default function Navbar() {
     </nav>
   );
 }
+

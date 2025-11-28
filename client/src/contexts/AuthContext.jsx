@@ -13,6 +13,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const openAuth = () => {
+    window.location.href = "/auth";
+  };
+
   const loadUser = async () => {
     try {
       const res = await getCurrentUser();
@@ -54,7 +58,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, updateAvatar, loading }}
+      value={{ user, login, register, logout, updateAvatar, loading, openAuth }}
     >
       {children}
     </AuthContext.Provider>
