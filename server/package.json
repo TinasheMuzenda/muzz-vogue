@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch src --exec \"node -r @babel/register src/index.jsx\"",
+    "muzz": "nodemon --watch src --exec \"node -r @babel/register src/index.jsx\"",
     "start": "node -r @babel/register src/index.jsx"
   },
   "keywords": [],

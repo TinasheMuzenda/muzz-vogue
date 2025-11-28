@@ -1,5 +1,6 @@
 import Order from "../models/Order.jsx";
 import { calculateDelivery } from "../utils/calcDelivery.jsx";
+import { io } from "../index.jsx";
 
 export const createOrder = async (req, res) => {
   const { userId, items, deliveryMethod, paymentMethod, address } = req.body;
@@ -38,6 +39,19 @@ export const updateOrder = async (req, res) => {
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
     }
+
+    const orderId = order._id;
+    const newStatus = updates.status || order.status;
+
+    io.to(`order_${orderId}`).emit("order:update", {
+      orderId,
+      status: newStatus,
+    });
+    io.to(`user_${order.userId}`).emit("order:update", {
+      orderId,
+      status: newStatus,
+    });
+    io.to("admins").emit("order:update", { orderId, status: newStatus });
 
     res.json(order);
   } catch (err) {

@@ -1,7 +1,9 @@
 import Stripe from "stripe";
 import Order from "../../models/Order.jsx";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET);
+const stripe = new Stripe(process.env.STRIPE_SECRET, {
+  apiVersion: "2022-11-15",
+});
 
 export const createStripeIntent = async (req, res) => {
   const { orderId } = req.body;

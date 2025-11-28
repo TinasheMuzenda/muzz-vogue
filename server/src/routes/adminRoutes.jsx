@@ -1,3 +1,4 @@
+import express from "express";
 import { Router } from "express";
 import multer from "multer";
 import {
@@ -48,5 +49,8 @@ router.post(
 router.post("/product/add", upload.array("images"), addProductWithFiles);
 
 router.put("/product/update/:id", upload.array("images"), updateProductByAdmin);
+
+router.post("/products", requireAdmin, addProductWithFiles);
+router.get("/messages", requireAdmin, listMessages);
 
 export default router;
